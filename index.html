@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>blackjack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+</head>
+<body>
+    <h3>Dealer: <span id="dealerPoints"></span></h3>
+    <p class="cards" id="dealer"></p>
+    <h3>You: <span id="playerPoints"></span></h3>
+    <p class="cards" id="player"></p>
+    <button id="draw">draw</button>
+    <button>hit</button>
+    <button id="stand">stand</button>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
