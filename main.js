@@ -15,19 +15,42 @@ function updateTable(table){
         playerString += card[0]
     });
     $("#player").html(playerString);
-    $("#playerPoints").html(table.dealer.points);
+    $("#playerPoints").html(table.player.points);
+
+    if(table.status != 0){
+        $("#stand").prop('disabled', true);
+        $("#hit").prop('disabled', true);
+        $("#draw").prop('disabled', false);
+    }
+    if(table.status==1){
+        $("#playerPoints").css('color','red');
+    }
+    if(table.status==3){
+        $("#playerPoints").css('color','green');
+    }
+
 }
 
 socket.on('draw',function(data){
     console.log(data);
     updateTable(data);
+    $("#stand").prop('disabled', false);
+    $("#hit").prop('disabled', false);
 });
 $("#draw").click(function(){
     socket.emit('draw',10);
+    $(this).prop('disabled', true);
 });
 $("#stand").click(function(){
     socket.emit('stand');
-    socket.on('stand', function(data){
+    socket.on('update', function(data){
+        console.log(data);
+        updateTable(data);
+    });
+});
+$("#hit").click(function(){
+    socket.emit('hit');
+    socket.on('update', function(data){
         console.log(data);
         updateTable(data);
     });

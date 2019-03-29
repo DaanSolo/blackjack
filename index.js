@@ -41,8 +41,25 @@ function updateDealer(table){
     while(table.dealer.points<17){
         table.dealer.cards.push(randomCard());
         table.dealer.points = updatePoints(table.dealer.cards);
-
     }
+}
+function checkStatus(table, checkPlayer){
+    if(table.player.points>21){
+        table.status = 1;
+        updateDealer(table);
+    }
+    if(checkPlayer){
+        if(table.player.points<table.dealer.points){
+            table.status = 1;
+        }
+        else if(table.player.points==table.dealer.points){
+            table.status = 2;
+        }
+        else if(table.player.points>table.dealer.points){
+            table.status = 3;
+        }
+    }
+    
 }
 
 app.get('/', function(req, res){
@@ -63,6 +80,7 @@ io.on('connection', function(socket){
         console.log(data);
 
         var table = {
+            "status" : 0,
             "dealer" : new Dealer,
             "player" : new Player
         };
@@ -70,8 +88,15 @@ io.on('connection', function(socket){
         socket.emit('draw',table);
 
         socket.on('stand',function(){
+            checkStatus(table, true);
             updateDealer(table);
-            socket.emit('stand',table);
+            socket.emit('update',table);
+        });
+        socket.on('hit', function(){
+            table.player.cards.push(randomCard());
+            table.player.points = updatePoints(table.player.cards);
+            checkStatus(table);
+            socket.emit('update',table);
         });
     })
   });
