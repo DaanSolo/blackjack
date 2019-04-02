@@ -6,15 +6,26 @@
     <title>blackjack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+    <link rel="stylesheet" type="text/css" href="cards.css">
 </head>
 <body>
-    <h3>Dealer: <span id="dealerPoints"></span></h3>
-    <p class="cards" id="dealer"></p>
-    <h3>You: <span id="playerPoints"></span></h3>
-    <p class="cards" id="player"></p>
-    <button id="draw">draw</button>
-    <button id="hit" disabled>hit</button>
-    <button id="stand" disabled>stand</button>
+    <div id="dealer">
+        <h3><span id="dealerPoints"></span></h3>
+        <div class="playingCards">
+            <ul class="table" id="table-dealer">
+            </ul>
+        </div>
+    </div>
+    <div id="player">
+        <h3><span id="playerPoints"></span></h3><br>
+        <div class="playingCards">
+            <ul class="table" id="table-player">
+            </ul>
+        </div>
+    </div>
+    <button id="draw">dobierz</button>
+    <button id="hit">podbij</button>
+    <button id="stand">pass</button>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="main.js"></script>

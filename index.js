@@ -2,45 +2,60 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var deck = [['🂡',11],['🂱',11],['🃁',11],['🃑',11],
-['🂢',2],['🂲',2],['🃂',2],['🃒',2],
-['🂣',3],['🂳',3],['🃃',3],['🃓',3],
-['🂤',4],['🂴',4],['🃄',4],['🃔',4],
-['🂥',5],['🂵',5],['🃅',5],['🃕',5],
-['🂦',6],['🂶',6],['🃆',6],['🃖',6],
-['🂧',7],['🂷',7],['🃇',7],['🃗',7],
-['🂨',8],['🂸',8],['🃈',8],['🃘',8],
-['🂩',9],['🂹',9],['🃉',9],['🃙',9],
-['🂪',10],['🂺',10],['🃊',10],['🃚',10],
-['🂫',10],['🂻',10],['🃋',10],['🃛',10],
-['🂭',10],['🂽',10],['🃍',10],['🃝',10],
-['🂮',10],['🂾',10],['🃎',10],['🃞',10]];
+var deck = require('./deck.json');
 
 var Dealer = function(){
-    this.cards = [randomCard(),['🂠',0]];
-    this.points = updatePoints(this.cards);
+    this.cards = [randomCard()],
+    this.aces = 0,
+    this.points = 0
 }
 
 var Player = function(){
     this.cards = [randomCard(),randomCard()],
-    this.points = updatePoints(this.cards);
+    this.aces = 0,
+    this.points = 0
 }
 
 function randomCard(){
     return deck[parseInt(Math.random() * 51)];
 }
-function updatePoints(cards){
+function updatePoints(player){
     var points = 0;
-    console.log(cards);
-    cards.forEach(card => {
-        points += card[1];
+    var aces = 0;
+
+    console.log(player);
+    player.cards.forEach(card => {
+        if(card){
+            switch(card.value){
+                case "j":
+                    points += 10;
+                    break;
+                case "q":
+                    points += 10;
+                    break;
+                case "k":
+                    points += 10;
+                    break;
+                case "a":
+                    aces += 1;
+                    break;
+                default:
+                    points += card.value;
+                    break;
+            }
+        }
     });
-    return points;
+
+    player.points = points;
+    player.aces = aces;
+
+    return player;
 }
+
 function updateDealer(table){
     while(table.dealer.points<17){
         table.dealer.cards.push(randomCard());
-        table.dealer.points = updatePoints(table.dealer.cards);
+        table.dealer = updatePoints(table.dealer);
     }
 }
 function checkStatus(table, checkPlayer){
@@ -59,7 +74,6 @@ function checkStatus(table, checkPlayer){
             table.status = 3;
         }
     }
-    
 }
 
 app.get('/', function(req, res){
@@ -68,9 +82,13 @@ app.get('/', function(req, res){
 app.get('/main.css', function(req, res){
     res.sendFile(__dirname + '/main.css');
 });
+app.get('/cards.css', function(req, res){
+    res.sendFile(__dirname + '/cards.css');
+});
 app.get('/main.js', function(req, res){
     res.sendFile(__dirname + '/main.js');
 });
+
 io.on('connection', function(socket){
     console.log('a user connected');
     socket.on('disconnect', function(){
@@ -85,6 +103,9 @@ io.on('connection', function(socket){
             "player" : new Player
         };
 
+        updatePoints(table.dealer);
+        updatePoints(table.player);
+
         socket.emit('draw',table);
 
         socket.on('stand',function(){
@@ -93,8 +114,9 @@ io.on('connection', function(socket){
             socket.emit('update',table);
         });
         socket.on('hit', function(){
+            console.log("hit");
             table.player.cards.push(randomCard());
-            table.player.points = updatePoints(table.player.cards);
+            table.player = updatePoints(table.player);
             checkStatus(table);
             socket.emit('update',table);
         });
