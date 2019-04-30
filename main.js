@@ -47,9 +47,11 @@ function updateTable(table){
     }
     if(table.status==1){
         $("#playerPoints").css('color','red');
+        $("#dealerPoints").css('color','green');
     }
     if(table.status==3){
         $("#playerPoints").css('color','green');
+        $("#dealerPoints").css('color','red');
     }
 }
 
@@ -59,6 +61,10 @@ socket.on('draw',function(data){
     $("#stand").prop('disabled', false);
     $("#hit").prop('disabled', false);
 });
+socket.on('update', function(data){
+    console.log(data);
+    updateTable(data);
+});
 $("#draw").click(function(){
     socket.emit('draw',10);
     $(this).prop('disabled', true);
@@ -67,15 +73,7 @@ $("#draw").click(function(){
 });
 $("#stand").click(function(){
     socket.emit('stand');
-    socket.on('update', function(data){
-        console.log(data);
-        updateTable(data);
-    });
 });
 $("#hit").click(function(){
     socket.emit('hit');
-    socket.on('update', function(data){
-        console.log(data);
-        updateTable(data);
-    });
 });
